@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:social_media_app/providers/auth_provider.dart';
 import 'package:social_media_app/screens/create_post_screen.dart';
+import 'package:social_media_app/screens/login_screen.dart';
 import '../providers/post_provider.dart';
 import 'feed_screen.dart';
 import 'search_screen.dart';
 import 'liked_screen.dart';
 import 'profile_screen.dart';
+import 'login_screen.dart';
 
 class HomeWrapper extends StatefulWidget {
   const HomeWrapper({super.key});
@@ -39,7 +41,11 @@ class _HomeWrapperState extends State<HomeWrapper> {
         leading: const Icon(Icons.logout),
         title: const Text("Logout"),
         onTap: () {
-          Navigator.pop(context);
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LoginScreen(),
+              ));
           context.read<AuthProvider>().logout();
         },
       ),
@@ -50,13 +56,13 @@ class _HomeWrapperState extends State<HomeWrapper> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SocialFeed', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('SocialFeed',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.message_outlined),
-            onPressed: () {
-            },
+            onPressed: () {},
           )
         ],
       ),
@@ -66,28 +72,30 @@ class _HomeWrapperState extends State<HomeWrapper> {
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
         onTap: (index) {
-  if (index == 2) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const CreatePostScreen()),
-    );
-    return; 
-  }
+          if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const CreatePostScreen()),
+            );
+            return;
+          }
 
-  if (index == 4) {
-    _onProfileLongPress(); 
-  }
+          if (index == 4) {
+            _onProfileLongPress();
+          }
 
-  setState(() {
-    _currentIndex = index;
-  });
-},
-
+          setState(() {
+            _currentIndex = index;
+          });
+        },
         items: [
           const BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          const BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(icon: Icon(Icons.add_box_outlined), label: ''),
-          const BottomNavigationBarItem(icon: Icon(Icons.favorite_border), label: 'Likes'),
+          const BottomNavigationBarItem(
+              icon: Icon(Icons.search), label: 'Search'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.add_box_outlined), label: ''),
+          const BottomNavigationBarItem(
+              icon: Icon(Icons.favorite_border), label: 'Likes'),
           BottomNavigationBarItem(
             icon: GestureDetector(
               onLongPress: _onProfileLongPress,

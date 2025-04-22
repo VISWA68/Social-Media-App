@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
@@ -16,6 +17,7 @@ class PostProvider with ChangeNotifier {
   List<PostModel> get posts => _posts;
   List<PostModel> get myPosts => _myPosts;
 
+  // Listen to all posts in real-time and filter them for the current user
   void listenToPosts() {
     _firestore
         .collection('posts')
@@ -36,24 +38,25 @@ class PostProvider with ChangeNotifier {
     });
   }
 
+  // Fetch my posts when needed (not just real-time listening)
+  Future<void> fetchMyPosts(String userId) async {
+    final snapshot = await _firestore
+        .collection('posts')
+        .where('userId', isEqualTo: userId)
+        .orderBy('createdAt', descending: true)
+        .get();
+
+    _myPosts.clear();
+    _myPosts.addAll(
+        snapshot.docs.map((doc) => PostModel.fromMap(doc.data())).toList());
+
+    notifyListeners();
+  }
+
   Future<void> createPost(File imageFile, String description) async {
-    final currentUserId = AuthService.getCurrentUserId();
-    final postId = const Uuid().v4();
-    final imageUrl = await _uploadImage(imageFile, postId);
-
-    final newPost = PostModel(
-      id: postId,
-      userId: currentUserId,
-      imageUrl: imageUrl,
-      description: description,
-      createdAt: DateTime.now(),
-      likes: [],
-    );
-
-    await _firestore.collection('posts').doc(postId).set(newPost.toMap());
-
-    _posts.insert(0, newPost);
-    _myPosts.insert(0, newPost);
+    final post = await uploadPost(imageFile, description);
+    _posts.insert(0, post);
+    _myPosts.insert(0, post); // Add the new post to the profile feed as well
     notifyListeners();
   }
 
@@ -73,12 +76,44 @@ class PostProvider with ChangeNotifier {
       post.likes.add(userId);
     }
 
-    notifyListeners(); // Update UI immediately
+    notifyListeners();
 
-    // Update in Firestore
     await FirebaseFirestore.instance
         .collection('posts')
         .doc(post.id)
         .update({'likes': post.likes});
+  }
+
+  Future<PostModel> uploadPost(File imageFile, String description) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) throw Exception('User not logged in');
+
+    final storageRef = FirebaseStorage.instance
+        .ref()
+        .child('posts')
+        .child('${DateTime.now().millisecondsSinceEpoch}_${user.uid}.jpg');
+
+    // Upload image
+    final uploadTask = await storageRef.putFile(imageFile);
+    final downloadUrl = await storageRef.getDownloadURL();
+
+    // Create post model
+    final postId = FirebaseFirestore.instance.collection('posts').doc().id;
+    final post = PostModel(
+      id: postId,
+      userId: user.uid,
+      imageUrl: downloadUrl,
+      description: description,
+      createdAt: DateTime.now(),
+      likes: [],
+    );
+
+    // Save to Firestore
+    await FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postId)
+        .set(post.toMap());
+
+    return post;
   }
 }

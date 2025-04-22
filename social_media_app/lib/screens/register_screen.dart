@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:social_media_app/screens/login_screen.dart';
 import '../providers/auth_provider.dart';
 import 'feed_screen.dart';
 
@@ -46,7 +47,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     if (success && context.mounted) {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (_) => const FeedScreen()),
+                        MaterialPageRoute(builder: (_) => const LoginScreen()),
                       );
                     }
                   },

@@ -57,7 +57,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             const SizedBox(height: 12),
             TextField(
               controller: _descController,
-              decoration: const InputDecoration(hintText: "Write a description..."),
+              decoration:
+                  const InputDecoration(hintText: "Write a description..."),
               maxLines: 3,
             ),
             const SizedBox(height: 20),

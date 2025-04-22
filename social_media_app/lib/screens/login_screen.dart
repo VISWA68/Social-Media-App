@@ -48,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     if (success && context.mounted) {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (_) => const FeedScreen()),
+                        MaterialPageRoute(builder: (_) => const HomeWrapper()),
                       );
                     }
                   },
