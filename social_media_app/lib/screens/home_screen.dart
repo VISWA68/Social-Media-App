@@ -62,10 +62,16 @@ class _HomeWrapperState extends State<HomeWrapper> {
           padding: const EdgeInsets.all(8.0),
           child: Image.asset('assets/logo.png', fit: BoxFit.cover),
         ),
-        title: const Text('Velozity', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Velozity',
+            style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(255, 220, 208, 208))),
         actions: [
           IconButton(
-            icon: const Icon(Icons.message_outlined),
+            icon: const Icon(
+              Icons.message_outlined,
+              color: Color.fromARGB(255, 220, 208, 208),
+            ),
             onPressed: () {},
           )
         ],
@@ -74,8 +80,16 @@ class _HomeWrapperState extends State<HomeWrapper> {
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.grey[900],
         currentIndex: _currentIndex,
-        selectedItemColor: Colors.blueAccent,
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: Color.fromARGB(255, 219, 202, 202),
+        unselectedItemColor: Colors.grey[600],
+        selectedLabelStyle: const TextStyle(
+            color: Color.fromARGB(255, 219, 202, 202),
+            fontWeight: FontWeight.bold),
+        unselectedLabelStyle: const TextStyle(color: Colors.grey),
+        selectedIconTheme: const IconThemeData(
+            color: Color.fromARGB(255, 219, 202, 202), size: 28),
+        unselectedIconTheme: const IconThemeData(color: Colors.grey, size: 24),
+        type: BottomNavigationBarType.fixed,
         onTap: (index) {
           if (index == 2) {
             Navigator.push(
@@ -93,9 +107,12 @@ class _HomeWrapperState extends State<HomeWrapper> {
         },
         items: [
           const BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          const BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(icon: Icon(Icons.add_box_outlined), label: ''),
-          const BottomNavigationBarItem(icon: Icon(Icons.favorite_border), label: 'Likes'),
+          const BottomNavigationBarItem(
+              icon: Icon(Icons.search), label: 'Search'),
+          const BottomNavigationBarItem(
+              icon: Icon(Icons.add_box_outlined), label: 'Create'),
+          const BottomNavigationBarItem(
+              icon: Icon(Icons.favorite_border), label: 'Likes'),
           BottomNavigationBarItem(
             icon: GestureDetector(
               onLongPress: _onProfileLongPress,

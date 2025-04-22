@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:social_media_app/widgets/comment_sheet.dart';
 import '../models/post_model.dart';
 import '../providers/post_provider.dart';
 import '../service/auth_service.dart';
@@ -63,35 +64,13 @@ class PostCard extends StatelessWidget {
                   onPressed: () {
                     showModalBottomSheet(
                       context: context,
-                      builder: (_) {
-                        return Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            children: [
-                              TextField(
-                                controller: commentController,
-                                decoration: const InputDecoration(
-                                  hintText: 'Add a comment...',
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              ElevatedButton(
-                                onPressed: () {
-                                  final commentText = commentController.text;
-                                  if (commentText.isNotEmpty) {
-                                    context
-                                        .read<PostProvider>()
-                                        .addComment(post, commentText);
-                                    Navigator.pop(
-                                        context); 
-                                  }
-                                },
-                                child: const Text('Post Comment'),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                      backgroundColor: Colors.black,
+                      isScrollControlled: true,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(20)),
+                      ),
+                      builder: (_) => CommentSheet(post: post),
                     );
                   },
                 ),
