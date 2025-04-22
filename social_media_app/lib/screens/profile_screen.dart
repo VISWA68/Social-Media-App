@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:social_media_app/screens/edit_profile.dart';
+import 'package:social_media_app/screens/login_screen.dart';
 import '../providers/auth_provider.dart';
 import '../providers/post_provider.dart';
 import '../widgets/post_card.dart';
@@ -23,9 +24,13 @@ class ProfileScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await context.read<AuthProvider>().logout();
-              Navigator.of(context).popUntil((route) => route.isFirst);
+            onPressed: () {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LoginScreen(),
+                  ));
+              context.read<AuthProvider>().logout();
             },
           ),
         ],
@@ -68,7 +73,6 @@ class ProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               const Divider(),
-              // My Posts Section
               const Padding(
                 padding: EdgeInsets.only(left: 8.0),
                 child: Text(
@@ -77,7 +81,6 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              // Posts Display
               myPosts.isEmpty
                   ? Padding(
                       padding: const EdgeInsets.only(top: 48.0),

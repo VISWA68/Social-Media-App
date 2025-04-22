@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:social_media_app/models/comment_model.dart';
 import 'package:uuid/uuid.dart';
 import '../models/post_model.dart';
 import '../service/auth_service.dart';
@@ -16,6 +17,9 @@ class PostProvider with ChangeNotifier {
 
   List<PostModel> get posts => _posts;
   List<PostModel> get myPosts => _myPosts;
+
+  final List<PostModel> _likedPosts = [];
+  List<PostModel> get likedPosts => _likedPosts;
 
   void listenToPosts() {
     _firestore
@@ -35,6 +39,30 @@ class PostProvider with ChangeNotifier {
 
       notifyListeners();
     });
+  }
+
+  Future<void> fetchLikedPosts() async {
+    try {
+      final userId = AuthService.getCurrentUserId();
+      if (userId == null) return;
+
+      final snapshot = await _firestore
+          .collection('posts')
+          .where('likes', arrayContains: userId)
+          .get();
+
+      _likedPosts.clear();
+
+      final posts = snapshot.docs
+          .map((doc) => PostModel.fromMap(doc.data()))
+          .toList()
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+      _likedPosts.addAll(posts);
+      notifyListeners();
+    } catch (e) {
+      print('Error fetching liked posts: $e');
+    }
   }
 
   Future<void> fetchMyPosts(String userId) async {
@@ -82,6 +110,29 @@ class PostProvider with ChangeNotifier {
         .update({'likes': post.likes});
   }
 
+  Future<void> addComment(PostModel post, String commentText) async {
+    final currentUserId = AuthService.getCurrentUserId();
+
+    final userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUserId)
+        .get();
+    final username = userDoc['username'];
+
+    final comment = Comment(
+      username: username,
+      text: commentText,
+      createdAt: DateTime.now(),
+    );
+
+    await _firestore.collection('posts').doc(post.id).update({
+      'comments': FieldValue.arrayUnion([comment.toMap()]),
+    });
+
+    post.comments.add(comment);
+    notifyListeners();
+  }
+
   Future<PostModel> uploadPost(File imageFile, String description) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) throw Exception('User not logged in');
@@ -110,6 +161,7 @@ class PostProvider with ChangeNotifier {
       likes: [],
       username: username,
       profileUrl: profileUrl,
+      comments: [],
     );
 
     await FirebaseFirestore.instance

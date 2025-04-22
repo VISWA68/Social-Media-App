@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'comment_model.dart';
 
 class PostModel {
   final String id;
@@ -9,6 +9,7 @@ class PostModel {
   final List<String> likes;
   final String username;
   final String? profileUrl;
+  final List<Comment> comments;
 
   PostModel({
     required this.id,
@@ -19,6 +20,7 @@ class PostModel {
     required this.likes,
     required this.username,
     this.profileUrl,
+    required this.comments,
   });
 
   Map<String, dynamic> toMap() {
@@ -31,6 +33,7 @@ class PostModel {
       'likes': likes,
       'username': username,
       'profileUrl': profileUrl,
+      'comments': comments.map((comment) => comment.toMap()).toList(),
     };
   }
 
@@ -44,7 +47,10 @@ class PostModel {
       likes: List<String>.from(map['likes']),
       username: map['username'],
       profileUrl: map['profileUrl'],
+      comments: map['comments'] != null
+          ? List<Comment>.from(
+              map['comments'].map((comment) => Comment.fromMap(comment)))
+          : [],
     );
   }
 }
-

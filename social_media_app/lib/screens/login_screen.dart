@@ -25,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset('assets/logo.jpeg', height: 100),
+                Image.asset('assets/logo.png', height: 100),
                 const SizedBox(height: 24),
                 TextField(
                   controller: _emailController,
@@ -63,8 +63,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 16),
                 GestureDetector(
                   onTap: () async {
-                    final success =
-                        await context.read<AuthProvider>().signInWithGoogle(context);
+                    final success = await context
+                        .read<AuthProvider>()
+                        .signInWithGoogle(context);
                     if (success && context.mounted) {
                       Navigator.pushReplacement(
                         context,

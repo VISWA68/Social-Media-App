@@ -14,6 +14,8 @@ class PostCard extends StatelessWidget {
     final currentUserId = AuthService.getCurrentUserId();
     final isLiked = post.likes.contains(currentUserId);
 
+    final commentController = TextEditingController();
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -33,7 +35,6 @@ class PostCard extends StatelessWidget {
               Text(post.username),
             ],
           ),
-
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(0)),
             child: Image.network(
@@ -43,7 +44,6 @@ class PostCard extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
             child: Row(
@@ -61,14 +61,47 @@ class PostCard extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.comment_outlined),
                   onPressed: () {
-                    // Navigate to comments
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (_) {
+                        return Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: [
+                              TextField(
+                                controller: commentController,
+                                decoration: const InputDecoration(
+                                  hintText: 'Add a comment...',
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              ElevatedButton(
+                                onPressed: () {
+                                  final commentText = commentController.text;
+                                  if (commentText.isNotEmpty) {
+                                    context
+                                        .read<PostProvider>()
+                                        .addComment(post, commentText);
+                                    Navigator.pop(
+                                        context); 
+                                  }
+                                },
+                                child: const Text('Post Comment'),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
                   },
                 ),
               ],
             ),
           ),
-
-          // Caption
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: Text('${post.likes.length} likes'),
+          ),
           if (post.description.isNotEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -77,8 +110,28 @@ class PostCard extends StatelessWidget {
                 style: const TextStyle(fontWeight: FontWeight.w500),
               ),
             ),
-
           const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: post.comments.map((comment) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        comment.username,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(comment.text),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
         ],
       ),
     );

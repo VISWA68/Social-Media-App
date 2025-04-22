@@ -58,7 +58,7 @@ class _HomeWrapperState extends State<HomeWrapper> {
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Image.asset(
-            'assets/logo.jpeg',
+            'assets/logo.png',
             fit: BoxFit.cover,
           ),
         ),
