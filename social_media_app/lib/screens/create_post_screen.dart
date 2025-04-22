@@ -14,6 +14,7 @@ class CreatePostScreen extends StatefulWidget {
 class _CreatePostScreenState extends State<CreatePostScreen> {
   final TextEditingController _descController = TextEditingController();
   File? _image;
+  bool _isLoading = false; 
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -28,12 +29,19 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
   void _post() async {
     if (_image != null && _descController.text.isNotEmpty) {
+      setState(() {
+        _isLoading = true; 
+      });
+
       await context.read<PostProvider>().createPost(
             _image!,
             _descController.text,
           );
 
       if (context.mounted) {
+        setState(() {
+          _isLoading = false; 
+        });
         Navigator.pop(context);
       }
     }
@@ -56,6 +64,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -103,29 +112,31 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               ),
             ),
             const SizedBox(height: 30),
-            ElevatedButton.icon(
-              onPressed: _post,
-              icon: const Icon(
-                Icons.upload_rounded,
-                color: Colors.white,
-              ),
-              label: const Text(
-                "Post",
-                style: TextStyle(color: Colors.white),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
-                textStyle: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-            ),
+            _isLoading 
+                ? const Center(child: CircularProgressIndicator())
+                : ElevatedButton.icon(
+                    onPressed: _post,
+                    icon: const Icon(
+                      Icons.upload_rounded,
+                      color: Colors.white,
+                    ),
+                    label: const Text(
+                      "Post",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 30, vertical: 14),
+                      textStyle: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                  ),
           ],
         ),
       ),
