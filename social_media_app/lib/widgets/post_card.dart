@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/post_model.dart';
+import '../providers/post_provider.dart';
+import '../service/auth_service.dart';
 
 class PostCard extends StatelessWidget {
   final PostModel post;
@@ -8,6 +11,9 @@ class PostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentUserId = AuthService.getCurrentUserId();
+    final isLiked = post.likes.contains(currentUserId);
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -15,15 +21,20 @@ class PostCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // User Info Row
           ListTile(
             leading: const CircleAvatar(
-              backgroundImage: AssetImage('assets/default_avatar.png'), 
+              backgroundImage: AssetImage('assets/default_avatar.png'),
             ),
-            title: Text(post.userId), 
-            subtitle: Text(post.createdAt.toLocal().toString().split(' ')[0]), 
+            title: Text(post.userId, style: const TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text(
+              _formatDate(post.createdAt),
+              style: const TextStyle(fontSize: 12),
+            ),
             trailing: const Icon(Icons.more_vert),
           ),
 
+          // Image
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(0)),
             child: Image.network(
@@ -34,21 +45,25 @@ class PostCard extends StatelessWidget {
             ),
           ),
 
+          // Like & Comment Row
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
             child: Row(
               children: [
                 IconButton(
                   icon: Icon(
-                    post.likes.contains(post.userId) ? Icons.favorite : Icons.favorite_border,
+                    isLiked ? Icons.favorite : Icons.favorite_border,
+                    color: isLiked ? Colors.red : null,
                   ),
                   onPressed: () {
+                    context.read<PostProvider>().toggleLike(post);
                   },
                 ),
                 const SizedBox(width: 16),
                 IconButton(
                   icon: const Icon(Icons.comment_outlined),
                   onPressed: () {
+                    // Navigate to comments
                   },
                 ),
               ],
@@ -56,17 +71,22 @@ class PostCard extends StatelessWidget {
           ),
 
           // Caption
-          if (post.caption.isNotEmpty)
+          if (post.description.isNotEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: Text(
-                post.caption,
+                post.description,
                 style: const TextStyle(fontWeight: FontWeight.w500),
               ),
             ),
+
           const SizedBox(height: 12),
         ],
       ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    return "${date.day}/${date.month}/${date.year}";
   }
 }
