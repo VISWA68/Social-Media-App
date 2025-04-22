@@ -22,10 +22,6 @@ class _FeedScreenState extends State<FeedScreen> {
     final posts = context.watch<PostProvider>().posts;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('SocialFeed', style: TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
-      ),
       body: ListView.builder(
         itemCount: posts.length,
         itemBuilder: (_, index) => PostCard(post: posts[index]),

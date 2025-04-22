@@ -24,7 +24,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset('assets/logo.png', height: 100),
+                Image.asset('assets/logo.jpeg', height: 100),
                 const SizedBox(height: 24),
                 TextField(
                   controller: _emailController,

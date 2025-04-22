@@ -26,7 +26,6 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Velozity App',
         theme: ThemeData(
-          primarySwatch: Colors.deepPurple,
           useMaterial3: true,
         ),
         home: const LoginScreen(),
