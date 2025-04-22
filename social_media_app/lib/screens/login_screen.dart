@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:social_media_app/screens/home_screen.dart';
 import '../providers/auth_provider.dart';
-import 'feed_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -65,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 GestureDetector(
                   onTap: () async {
                     final success =
-                        await context.read<AuthProvider>().signInWithGoogle();
+                        await context.read<AuthProvider>().signInWithGoogle(context);
                     if (success && context.mounted) {
                       Navigator.pushReplacement(
                         context,

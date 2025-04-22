@@ -21,12 +21,23 @@ class PostCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // User Info Row
+          Row(
+            children: [
+              CircleAvatar(
+                backgroundImage: post.profileUrl != null
+                    ? NetworkImage(post.profileUrl!)
+                    : const AssetImage('assets/default_avatar.png')
+                        as ImageProvider,
+              ),
+              const SizedBox(width: 8),
+              Text(post.username),
+            ],
+          ),
+
           ListTile(
             leading: const CircleAvatar(
               backgroundImage: AssetImage('assets/default_avatar.png'),
             ),
-            title: Text(post.userId, style: const TextStyle(fontWeight: FontWeight.bold)),
             subtitle: Text(
               _formatDate(post.createdAt),
               style: const TextStyle(fontSize: 12),

@@ -8,7 +8,6 @@ import 'feed_screen.dart';
 import 'search_screen.dart';
 import 'liked_screen.dart';
 import 'profile_screen.dart';
-import 'login_screen.dart';
 
 class HomeWrapper extends StatefulWidget {
   const HomeWrapper({super.key});

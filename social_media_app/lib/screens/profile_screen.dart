@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:social_media_app/screens/edit_profile.dart';
 import '../providers/auth_provider.dart';
 import '../providers/post_provider.dart';
 import '../widgets/post_card.dart';
@@ -48,6 +49,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
               backgroundImage: AssetImage('assets/default_avatar.png'),
             ),
             const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+                );
+              },
+              child: const Text("Edit Profile"),
+            ),
             Text(
               user?.email ?? 'Anonymous',
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),

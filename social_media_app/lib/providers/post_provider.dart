@@ -56,7 +56,7 @@ class PostProvider with ChangeNotifier {
   Future<void> createPost(File imageFile, String description) async {
     final post = await uploadPost(imageFile, description);
     _posts.insert(0, post);
-    _myPosts.insert(0, post); // Add the new post to the profile feed as well
+    _myPosts.insert(0, post);
     notifyListeners();
   }
 
@@ -96,8 +96,13 @@ class PostProvider with ChangeNotifier {
     // Upload image
     final uploadTask = await storageRef.putFile(imageFile);
     final downloadUrl = await storageRef.getDownloadURL();
+    final userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+    final username = userDoc['username'];
+    final profileUrl = userDoc['profileUrl'];
 
-    // Create post model
     final postId = FirebaseFirestore.instance.collection('posts').doc().id;
     final post = PostModel(
       id: postId,
@@ -106,6 +111,8 @@ class PostProvider with ChangeNotifier {
       description: description,
       createdAt: DateTime.now(),
       likes: [],
+      username: username,
+      profileUrl: profileUrl,
     );
 
     // Save to Firestore

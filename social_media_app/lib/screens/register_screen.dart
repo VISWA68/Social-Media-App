@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:social_media_app/screens/login_screen.dart';
 import '../providers/auth_provider.dart';
-import 'feed_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -14,6 +13,7 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +27,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
               children: [
                 Image.asset('assets/logo.jpeg', height: 100),
                 const SizedBox(height: 24),
+                TextField(
+                  controller: _usernameController,
+                  decoration: const InputDecoration(labelText: 'Username'),
+                ),
+                const SizedBox(height: 12),
                 TextField(
                   controller: _emailController,
                   decoration: const InputDecoration(labelText: 'Email'),
@@ -43,6 +48,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     final success = await context.read<AuthProvider>().register(
                           _emailController.text,
                           _passwordController.text,
+                          _usernameController.text,
                         );
                     if (success && context.mounted) {
                       Navigator.pushReplacement(
@@ -52,7 +58,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     }
                   },
                   child: const Text('Register'),
-                )
+                ),
               ],
             ),
           ),
