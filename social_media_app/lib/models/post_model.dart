@@ -32,7 +32,7 @@ class PostModel {
       userId: map['userId'],
       imageUrl: map['imageUrl'],
       caption: map['caption'],
-      createdAt: map['createdAt'].toDate(),
+      createdAt: map['createdAt'].toDate(), // Ensure this is a Firebase Timestamp
       likes: List<String>.from(map['likes']),
     );
   }
