@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:social_media_app/widgets/comment_sheet.dart';
 import '../models/post_model.dart';
 import '../providers/post_provider.dart';
 import '../service/auth_service.dart';
+import 'comment_sheet.dart'; // Your previous comment sheet
 
 class PostCard extends StatelessWidget {
   final PostModel post;
@@ -15,34 +15,49 @@ class PostCard extends StatelessWidget {
     final currentUserId = AuthService.getCurrentUserId();
     final isLiked = post.likes.contains(currentUserId);
 
-    final commentController = TextEditingController();
-
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: Colors.grey[900],
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       elevation: 4,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              CircleAvatar(
-                backgroundImage: post.profileUrl != null
-                    ? NetworkImage(post.profileUrl!)
-                    : const AssetImage('assets/default_avatar.png')
-                        as ImageProvider,
-              ),
-              const SizedBox(width: 8),
-              Text(post.username),
-            ],
+          ListTile(
+            leading: CircleAvatar(
+              backgroundImage: post.profileUrl != null
+                  ? NetworkImage(post.profileUrl!)
+                  : const AssetImage('assets/default_avatar.png')
+                      as ImageProvider,
+              radius: 22,
+            ),
+            title: Text(
+              post.username,
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+            subtitle: Text(
+              _formatDate(post.createdAt),
+              style: TextStyle(color: Colors.grey[400], fontSize: 12),
+            ),
+            trailing: IconButton(
+              icon: const Icon(Icons.more_vert, color: Colors.white),
+              onPressed: () {},
+            ),
           ),
           ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(0)),
+            borderRadius: BorderRadius.circular(16),
             child: Image.network(
               post.imageUrl,
               width: double.infinity,
-              height: 250,
+              height: 300,
               fit: BoxFit.cover,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return const Center(
+                  child: CircularProgressIndicator(color: Colors.blueAccent),
+                );
+              },
             ),
           ),
           Padding(
@@ -52,24 +67,22 @@ class PostCard extends StatelessWidget {
                 IconButton(
                   icon: Icon(
                     isLiked ? Icons.favorite : Icons.favorite_border,
-                    color: isLiked ? Colors.red : null,
+                    color: isLiked ? Colors.red : Colors.white,
+                    size: 28,
                   ),
                   onPressed: () {
                     context.read<PostProvider>().toggleLike(post);
                   },
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 8),
                 IconButton(
-                  icon: const Icon(Icons.comment_outlined),
+                  icon: const Icon(Icons.comment_outlined,
+                      color: Colors.white, size: 28),
                   onPressed: () {
                     showModalBottomSheet(
                       context: context,
-                      backgroundColor: Colors.black,
                       isScrollControlled: true,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(20)),
-                      ),
+                      backgroundColor: Colors.transparent,
                       builder: (_) => CommentSheet(post: post),
                     );
                   },
@@ -78,39 +91,23 @@ class PostCard extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: Text('${post.likes.length} likes'),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              '${post.likes.length} likes',
+              style: const TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.bold),
+            ),
           ),
           if (post.description.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6),
               child: Text(
                 post.description,
-                style: const TextStyle(fontWeight: FontWeight.w500),
+                style: const TextStyle(color: Colors.white70, fontSize: 15),
               ),
             ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: post.comments.map((comment) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        comment.username,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(comment.text),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
+          const SizedBox(height: 10),
         ],
       ),
     );

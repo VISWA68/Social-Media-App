@@ -3,29 +3,27 @@ import 'package:provider/provider.dart';
 import '../providers/post_provider.dart';
 import '../widgets/post_card.dart';
 
-class FeedScreen extends StatefulWidget {
+class FeedScreen extends StatelessWidget {
   const FeedScreen({super.key});
-
-  @override
-  State<FeedScreen> createState() => _FeedScreenState();
-}
-
-class _FeedScreenState extends State<FeedScreen> {
-  @override
-  void initState() {
-    super.initState();
-    context.read<PostProvider>().listenToPosts();
-  }
 
   @override
   Widget build(BuildContext context) {
     final posts = context.watch<PostProvider>().posts;
 
     return Scaffold(
-      body: ListView.builder(
-        itemCount: posts.length,
-        itemBuilder: (_, index) => PostCard(post: posts[index]),
-      ),
+      backgroundColor: Colors.black,
+      body: posts.isEmpty
+          ? const Center(
+              child: Text(
+                "No posts yet",
+                style: TextStyle(color: Colors.grey),
+              ),
+            )
+          : ListView.builder(
+              itemCount: posts.length,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              itemBuilder: (_, index) => PostCard(post: posts[index]),
+            ),
     );
   }
 }
