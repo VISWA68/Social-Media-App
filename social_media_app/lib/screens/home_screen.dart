@@ -5,7 +5,7 @@ import 'package:social_media_app/screens/create_post_screen.dart';
 import 'package:social_media_app/screens/login_screen.dart';
 import '../providers/post_provider.dart';
 import 'feed_screen.dart';
-import 'search_screen.dart';
+import 'other_user/search_screen.dart';
 import 'liked_screen.dart';
 import 'profile_screen.dart';
 
@@ -19,12 +19,12 @@ class HomeWrapper extends StatefulWidget {
 class _HomeWrapperState extends State<HomeWrapper> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = const [
-    FeedScreen(),
-    SearchScreen(),
-    SizedBox(),
-    LikedScreen(),
-    ProfileScreen(),
+  final List<Widget> _screens = [
+    const FeedScreen(),
+    UserSearchScreen(),
+    const SizedBox(),
+    const LikedScreen(),
+    const ProfileScreen(),
   ];
 
   @override
