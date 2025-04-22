@@ -34,8 +34,6 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
           .where('username', isLessThanOrEqualTo: query + '\uf8ff')
           .get();
 
-      print('Query result: ${snapshot.docs.length} results');
-
       final results = snapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
         data['id'] = doc.id;
@@ -47,14 +45,12 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
         _isLoading = false;
       });
     } catch (e) {
-      print('Error searching users: $e');
       setState(() {
         _isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Error searching users. Please try again.'),
-        ),
+            content: Text('Error searching users. Please try again.')),
       );
     }
   }
@@ -68,61 +64,82 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Search Users'),
-      ),
+      backgroundColor: Colors.black,
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(12.0),
             child: TextField(
               controller: _searchController,
               onChanged: _searchUsers,
-              decoration: const InputDecoration(
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
                 hintText: 'Search by username',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.search),
+                hintStyle: TextStyle(color: Colors.grey[400]),
+                filled: true,
+                fillColor: Colors.grey[900],
+                prefixIcon: const Icon(Icons.search, color: Colors.white),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
           ),
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(
+                    child: CircularProgressIndicator(color: Colors.blueAccent))
                 : _searchResults.isEmpty
-                    ? const Center(child: Text('No users found'))
+                    ? const Center(
+                        child: Text(
+                          'No users found',
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                      )
                     : ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
                         itemCount: _searchResults.length,
                         itemBuilder: (context, index) {
                           final user = _searchResults[index];
-                          return ListTile(
-                            leading: CircleAvatar(
-                              backgroundImage: NetworkImage(user.profileUrl),
-                              onBackgroundImageError: (_, __) {
-                                // Handle error loading image
-                              },
-                              child: user.profileUrl.isEmpty
-                                  ? const Icon(Icons.person)
-                                  : null,
+                          return Card(
+                            color: Colors.grey[850],
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                            title: Text(user.username),
-                            subtitle: Text(user.bio),
-                            onTap: () {
-                              if (user.id.isNotEmpty) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        UserProfileScreen(userId: user.id),
-                                  ),
-                                );
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('User ID not found'),
-                                  ),
-                                );
-                              }
-                            },
+                            margin: const EdgeInsets.symmetric(vertical: 6),
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                backgroundImage: NetworkImage(user.profileUrl),
+                                backgroundColor: Colors.grey[700],
+                                child: user.profileUrl.isEmpty
+                                    ? const Icon(Icons.person,
+                                        color: Colors.white)
+                                    : null,
+                              ),
+                              title: Text(user.username,
+                                  style: const TextStyle(color: Colors.white)),
+                              subtitle: Text(user.bio,
+                                  style:
+                                      const TextStyle(color: Colors.white70)),
+                              onTap: () {
+                                if (user.id.isNotEmpty) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          UserProfileScreen(userId: user.id),
+                                    ),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('User ID not found'),
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
                           );
                         },
                       ),

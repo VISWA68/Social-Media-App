@@ -40,33 +40,92 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   }
 
   @override
+  void dispose() {
+    _descController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Create Post")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: const Text(
+          "Create Post",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            _image != null
-                ? Image.file(_image!, height: 200)
-                : TextButton.icon(
-                    onPressed: _pickImage,
-                    icon: const Icon(Icons.image),
-                    label: const Text("Pick Image"),
-                  ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _descController,
-              decoration:
-                  const InputDecoration(hintText: "Write a description..."),
-              maxLines: 3,
+            GestureDetector(
+              onTap: _pickImage,
+              child: _image != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Image.file(
+                        _image!,
+                        height: 250,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : Container(
+                      height: 250,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[800],
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Center(
+                        child: Icon(Icons.add_photo_alternate_outlined,
+                            size: 60, color: Colors.white),
+                      ),
+                    ),
             ),
             const SizedBox(height: 20),
+            TextField(
+              controller: _descController,
+              maxLines: 5,
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: "Write a description...",
+                hintStyle: TextStyle(color: Colors.grey[400]),
+                filled: true,
+                fillColor: Colors.grey[900],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
             ElevatedButton.icon(
               onPressed: _post,
-              icon: const Icon(Icons.upload),
-              label: const Text("Post"),
-            )
+              icon: const Icon(
+                Icons.upload_rounded,
+                color: Colors.white,
+              ),
+              label: const Text(
+                "Post",
+                style: TextStyle(color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
+                textStyle: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
           ],
         ),
       ),

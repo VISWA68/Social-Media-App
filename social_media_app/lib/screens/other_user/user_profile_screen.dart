@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:social_media_app/screens/other_user/user_model.dart';
+// Import the screens if needed later
+// import 'package:social_media_app/screens/other_user/followers_list_screen.dart';
+// import 'package:social_media_app/screens/other_user/following_list_screen.dart';
+// import 'package:social_media_app/screens/other_user/user_posts_screen.dart';
 
 class UserProfileScreen extends StatefulWidget {
   final String userId;
@@ -44,6 +48,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.grid_view_rounded),
+            onPressed: () {
+              // Navigator.push(context, MaterialPageRoute(
+              //   builder: (_) => UserPostsScreen(userId: widget.userId),
+              // ));
+            },
+          ),
+        ],
       ),
       body: FutureBuilder<UserModel>(
         future: _userFuture,
@@ -64,12 +78,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 const SizedBox(height: 20),
                 CircleAvatar(
                   radius: 50,
-                  backgroundImage: NetworkImage(user.profileUrl),
-                  onBackgroundImageError: (_, __) {
-                    // Handle error loading image
-                  },
-                  child:
-                      user.profileUrl.isEmpty ? const Icon(Icons.person) : null,
+                  backgroundImage: user.profileUrl.isNotEmpty
+                      ? NetworkImage(user.profileUrl)
+                      : null,
+                  child: user.profileUrl.isEmpty
+                      ? const Icon(Icons.person, size: 50)
+                      : null,
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -77,30 +91,103 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 8),
-                Text(user.bio),
+                Text(user.bio.isNotEmpty ? user.bio : 'No bio yet'),
                 const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Column(
-                      children: [
-                        Text(
-                          user.followers.length.toString(),
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const Text('Followers'),
-                      ],
+                    GestureDetector(
+                      onTap: () {
+                        // Navigator.push(context, MaterialPageRoute(
+                        //   builder: (_) => FollowersListScreen(followerIds: user.followers),
+                        // ));
+                      },
+                      child: Column(
+                        children: [
+                          Text(
+                            user.followers.length.toString(),
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          const Text('Followers'),
+                        ],
+                      ),
                     ),
-                    Column(
-                      children: [
-                        Text(
-                          user.following.length.toString(),
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const Text('Following'),
-                      ],
+                    GestureDetector(
+                      onTap: () {
+                        // Navigator.push(context, MaterialPageRoute(
+                        //   builder: (_) => FollowingListScreen(followingIds: user.following),
+                        // ));
+                      },
+                      child: Column(
+                        children: [
+                          Text(
+                            user.following.length.toString(),
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          const Text('Following'),
+                        ],
+                      ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.grid_view_rounded),
+                  label: const Text('View Posts'),
+                  onPressed: () {
+                    // Navigator.push(context, MaterialPageRoute(
+                    //   builder: (_) => UserPostsScreen(userId: widget.userId),
+                    // ));
+                  },
+                ),
+                const SizedBox(height: 20),
+                // Tab Navigation
+                DefaultTabController(
+                  length: 2, // Two tabs: Info and Posts
+                  child: Column(
+                    children: [
+                      TabBar(
+                        tabs: [
+                          Tab(text: "Info"),
+                          Tab(text: "Posts"),
+                        ],
+                      ),
+                      Container(
+                        height: 400, // Height for the tab content
+                        child: TabBarView(
+                          children: [
+                            // Info Tab
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Username: ${user.username}"),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                      "Bio: ${user.bio.isNotEmpty ? user.bio : 'No bio available.'}"),
+                                  const SizedBox(height: 8),
+                                  Text("Followers: ${user.followers.length}"),
+                                  const SizedBox(height: 8),
+                                  Text("Following: ${user.following.length}"),
+                                ],
+                              ),
+                            ),
+                            // Posts Tab (Placeholder, add your posts logic here)
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                children: [
+                                  const Text("User's posts will appear here."),
+                                  // Future builder or list view for posts here
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
