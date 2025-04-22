@@ -17,7 +17,6 @@ class PostProvider with ChangeNotifier {
   List<PostModel> get posts => _posts;
   List<PostModel> get myPosts => _myPosts;
 
-  // Listen to all posts in real-time and filter them for the current user
   void listenToPosts() {
     _firestore
         .collection('posts')
@@ -38,7 +37,6 @@ class PostProvider with ChangeNotifier {
     });
   }
 
-  // Fetch my posts when needed (not just real-time listening)
   Future<void> fetchMyPosts(String userId) async {
     final snapshot = await _firestore
         .collection('posts')
@@ -93,7 +91,6 @@ class PostProvider with ChangeNotifier {
         .child('posts')
         .child('${DateTime.now().millisecondsSinceEpoch}_${user.uid}.jpg');
 
-    // Upload image
     final uploadTask = await storageRef.putFile(imageFile);
     final downloadUrl = await storageRef.getDownloadURL();
     final userDoc = await FirebaseFirestore.instance
@@ -115,7 +112,6 @@ class PostProvider with ChangeNotifier {
       profileUrl: profileUrl,
     );
 
-    // Save to Firestore
     await FirebaseFirestore.instance
         .collection('posts')
         .doc(postId)

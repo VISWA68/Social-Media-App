@@ -34,18 +34,6 @@ class PostCard extends StatelessWidget {
             ],
           ),
 
-          ListTile(
-            leading: const CircleAvatar(
-              backgroundImage: AssetImage('assets/default_avatar.png'),
-            ),
-            subtitle: Text(
-              _formatDate(post.createdAt),
-              style: const TextStyle(fontSize: 12),
-            ),
-            trailing: const Icon(Icons.more_vert),
-          ),
-
-          // Image
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(0)),
             child: Image.network(
@@ -56,7 +44,6 @@ class PostCard extends StatelessWidget {
             ),
           ),
 
-          // Like & Comment Row
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
             child: Row(

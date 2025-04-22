@@ -5,27 +5,17 @@ import '../providers/auth_provider.dart';
 import '../providers/post_provider.dart';
 import '../widgets/post_card.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
-
-  @override
-  _ProfileScreenState createState() => _ProfileScreenState();
-}
-
-class _ProfileScreenState extends State<ProfileScreen> {
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final user = context.read<AuthProvider>().currentUser;
-    if (user != null) {
-      context.read<PostProvider>().fetchMyPosts(user.uid);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().currentUser;
     final myPosts = context.watch<PostProvider>().myPosts;
+
+    final profileImageUrl = user?.profileImageUrl;
+    final username = user?.username ?? 'No username';
+    final email = user?.email ?? 'Anonymous';
 
     return Scaffold(
       appBar: AppBar(
@@ -41,58 +31,71 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 24),
-            const CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage('assets/default_avatar.png'),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const EditProfileScreen()),
-                );
-              },
-              child: const Text("Edit Profile"),
-            ),
-            Text(
-              user?.email ?? 'Anonymous',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            const Text('Bio goes here...',
-                style: TextStyle(color: Colors.grey)),
-            const SizedBox(height: 24),
-            const Divider(),
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text('My Posts',
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              const SizedBox(height: 24),
+              CircleAvatar(
+                radius: 50,
+                backgroundImage:
+                    profileImageUrl != null && profileImageUrl.isNotEmpty
+                        ? NetworkImage(profileImageUrl)
+                        : const AssetImage('assets/default_avatar.png')
+                            as ImageProvider,
               ),
-            ),
-            myPosts.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.only(top: 48.0),
-                    child: Text(
-                      'No posts yet!',
-                      style: TextStyle(color: Colors.grey[600]),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const EditProfileScreen()),
+                  );
+                },
+                child: const Text("Edit Profile"),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                username,
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                email,
+                style: const TextStyle(color: Colors.grey),
+              ),
+              const SizedBox(height: 24),
+              const Divider(),
+              // My Posts Section
+              const Padding(
+                padding: EdgeInsets.only(left: 8.0),
+                child: Text(
+                  'My Posts',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+              ),
+              const SizedBox(height: 8),
+              // Posts Display
+              myPosts.isEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 48.0),
+                      child: Text(
+                        'No posts yet!',
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                    )
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: myPosts.length,
+                      itemBuilder: (context, index) {
+                        return PostCard(post: myPosts[index]);
+                      },
                     ),
-                  )
-                : ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: myPosts.length,
-                    itemBuilder: (context, index) {
-                      return PostCard(post: myPosts[index]);
-                    },
-                  ),
-          ],
+            ],
+          ),
         ),
       ),
     );

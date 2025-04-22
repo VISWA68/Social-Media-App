@@ -16,7 +16,7 @@ class AppUser {
       uid: map['uid'],
       email: map['email'],
       username: map['username'],
-      profileImageUrl: map['profileImageUrl'],
+      profileImageUrl: map['profileUrl'],
     );
   }
 

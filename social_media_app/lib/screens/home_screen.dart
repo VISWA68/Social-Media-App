@@ -55,9 +55,15 @@ class _HomeWrapperState extends State<HomeWrapper> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SocialFeed',
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Image.asset(
+            'assets/logo.jpeg',
+            fit: BoxFit.cover,
+          ),
+        ),
+        title: const Text('Velozity',
             style: TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.message_outlined),
