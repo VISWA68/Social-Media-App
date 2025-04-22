@@ -35,15 +35,16 @@ class _HomeWrapperState extends State<HomeWrapper> {
 
   void _onProfileLongPress() {
     showModalBottomSheet(
+      backgroundColor: Colors.grey[900],
       context: context,
       builder: (_) => ListTile(
-        leading: const Icon(Icons.logout),
-        title: const Text("Logout"),
+        leading: const Icon(Icons.logout, color: Colors.white),
+        title: const Text("Logout", style: TextStyle(color: Colors.white)),
         onTap: () {
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => LoginScreen(),
+                builder: (context) => const LoginScreen(),
               ));
           context.read<AuthProvider>().logout();
         },
@@ -54,16 +55,14 @@ class _HomeWrapperState extends State<HomeWrapper> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
+        backgroundColor: Colors.grey[900],
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Image.asset(
-            'assets/logo.png',
-            fit: BoxFit.cover,
-          ),
+          child: Image.asset('assets/logo.png', fit: BoxFit.cover),
         ),
-        title: const Text('Velozity',
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Velozity', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
             icon: const Icon(Icons.message_outlined),
@@ -73,8 +72,9 @@ class _HomeWrapperState extends State<HomeWrapper> {
       ),
       body: _screens[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.grey[900],
         currentIndex: _currentIndex,
-        selectedItemColor: Colors.blue,
+        selectedItemColor: Colors.blueAccent,
         unselectedItemColor: Colors.grey,
         onTap: (index) {
           if (index == 2) {
@@ -84,23 +84,18 @@ class _HomeWrapperState extends State<HomeWrapper> {
             );
             return;
           }
-
           if (index == 4) {
             _onProfileLongPress();
           }
-
           setState(() {
             _currentIndex = index;
           });
         },
         items: [
           const BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          const BottomNavigationBarItem(
-              icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.add_box_outlined), label: ''),
-          const BottomNavigationBarItem(
-              icon: Icon(Icons.favorite_border), label: 'Likes'),
+          const BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
+          BottomNavigationBarItem(icon: Icon(Icons.add_box_outlined), label: ''),
+          const BottomNavigationBarItem(icon: Icon(Icons.favorite_border), label: 'Likes'),
           BottomNavigationBarItem(
             icon: GestureDetector(
               onLongPress: _onProfileLongPress,
