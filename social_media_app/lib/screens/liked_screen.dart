@@ -70,11 +70,17 @@ class _PostCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ListTile(
-            leading: CircleAvatar(
-              backgroundImage: NetworkImage(post.profileUrl!),
-            ),
-            title: Text(post.username, style: const TextStyle(color: Colors.white)),
-            subtitle: Text(post.description, style: TextStyle(color: Colors.grey[400])),
+            leading: post.profileUrl != null
+                ? CircleAvatar(
+                    backgroundImage: NetworkImage(post.profileUrl!),
+                  )
+                : const CircleAvatar(
+                    child: Icon(Icons.person),
+                  ),
+            title: Text(post.username,
+                style: const TextStyle(color: Colors.white)),
+            subtitle:
+                Text(post.description, style: TextStyle(color: Colors.grey)),
           ),
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
