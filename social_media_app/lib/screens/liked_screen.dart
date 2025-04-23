@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/post_provider.dart';
@@ -72,7 +73,8 @@ class _PostCard extends StatelessWidget {
           ListTile(
             leading: post.profileUrl != null
                 ? CircleAvatar(
-                    backgroundImage: NetworkImage(post.profileUrl!),
+                    backgroundImage:
+                        CachedNetworkImageProvider(post.profileUrl!),
                   )
                 : const CircleAvatar(
                     child: Icon(Icons.person),
@@ -84,11 +86,22 @@ class _PostCard extends StatelessWidget {
           ),
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            child: Image.network(
-              post.imageUrl,
+            child: CachedNetworkImage(
+              imageUrl: post.imageUrl,
               height: 200,
               width: double.infinity,
               fit: BoxFit.cover,
+              placeholder: (context, url) => Container(
+                height: 200,
+                color: Colors.grey[800],
+                child: const Center(
+                    child: CircularProgressIndicator(color: Colors.white)),
+              ),
+              errorWidget: (context, url, error) => Container(
+                height: 200,
+                color: Colors.grey[800],
+                child: const Icon(Icons.error, color: Colors.red),
+              ),
             ),
           ),
           Padding(
