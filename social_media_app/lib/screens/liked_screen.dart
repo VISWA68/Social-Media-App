@@ -14,16 +14,18 @@ class _LikedScreenState extends State<LikedScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-      () => context.read<PostProvider>().fetchLikedPosts(),
-    );
+    Future.microtask(() => context.read<PostProvider>().fetchLikedPosts());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('Liked Posts'),
+        backgroundColor: Colors.transparent,
+        title: const Text('Liked Posts', style: TextStyle(color: Colors.white)),
+        iconTheme: const IconThemeData(color: Colors.white),
+        elevation: 0,
       ),
       body: Consumer<PostProvider>(
         builder: (context, postProvider, child) {
@@ -31,15 +33,19 @@ class _LikedScreenState extends State<LikedScreen> {
 
           if (likedPosts.isEmpty) {
             return const Center(
-              child: Text('No liked posts yet'),
+              child: Text(
+                'No liked posts yet',
+                style: TextStyle(color: Colors.white70, fontSize: 16),
+              ),
             );
           }
 
           return ListView.builder(
+            padding: const EdgeInsets.all(12),
             itemCount: likedPosts.length,
             itemBuilder: (context, index) {
               final post = likedPosts[index];
-              return PostCard(post: post);
+              return _PostCard(post: post);
             },
           );
         },
@@ -48,18 +54,18 @@ class _LikedScreenState extends State<LikedScreen> {
   }
 }
 
-class PostCard extends StatelessWidget {
+class _PostCard extends StatelessWidget {
   final PostModel post;
 
-  const PostCard({
-    super.key,
-    required this.post,
-  });
+  const _PostCard({super.key, required this.post});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.all(8.0),
+      color: Colors.grey[900],
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 4,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -67,22 +73,26 @@ class PostCard extends StatelessWidget {
             leading: CircleAvatar(
               backgroundImage: NetworkImage(post.profileUrl!),
             ),
-            title: Text(post.username),
-            subtitle: Text(post.description),
+            title: Text(post.username, style: const TextStyle(color: Colors.white)),
+            subtitle: Text(post.description, style: TextStyle(color: Colors.grey[400])),
           ),
-          Image.network(
-            post.imageUrl,
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: 200,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.network(
+              post.imageUrl,
+              height: 200,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                Icon(Icons.favorite, color: Colors.red),
+                const Icon(Icons.favorite, color: Colors.redAccent),
                 const SizedBox(width: 8),
-                Text('${post.likes.length} likes'),
+                Text('${post.likes.length} likes',
+                    style: TextStyle(color: Colors.grey[300])),
               ],
             ),
           ),

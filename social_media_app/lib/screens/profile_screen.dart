@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:social_media_app/screens/edit_profile.dart';
-import 'package:social_media_app/screens/login_screen.dart';
 import '../providers/auth_provider.dart';
 import '../providers/post_provider.dart';
 import '../widgets/post_card.dart';
+import 'edit_profile.dart';
+import 'login_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -19,86 +19,76 @@ class ProfileScreen extends StatelessWidget {
     final email = user?.email ?? 'Anonymous';
 
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: const Text('Profile', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginScreen(),
-                  ));
               context.read<AuthProvider>().logout();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+              );
             },
           ),
         ],
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              const SizedBox(height: 24),
-              CircleAvatar(
-                radius: 50,
-                backgroundImage:
-                    profileImageUrl != null && profileImageUrl.isNotEmpty
-                        ? NetworkImage(profileImageUrl)
-                        : const AssetImage('assets/default_avatar.png')
-                            as ImageProvider,
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            CircleAvatar(
+              radius: 55,
+              backgroundColor: Colors.blueAccent,
+              backgroundImage: profileImageUrl != null && profileImageUrl.isNotEmpty
+                  ? NetworkImage(profileImageUrl)
+                  : const AssetImage('assets/default_avatar.png') as ImageProvider,
+            ),
+            const SizedBox(height: 16),
+            Text(username,
+                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
+            const SizedBox(height: 4),
+            Text(email, style: TextStyle(color: Colors.grey[400])),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen()));
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => const EditProfileScreen()),
-                  );
-                },
-                child: const Text("Edit Profile"),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                username,
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                email,
-                style: const TextStyle(color: Colors.grey),
-              ),
-              const SizedBox(height: 24),
-              const Divider(),
-              const Padding(
-                padding: EdgeInsets.only(left: 8.0),
-                child: Text(
-                  'My Posts',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-              ),
-              const SizedBox(height: 8),
-              myPosts.isEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.only(top: 48.0),
-                      child: Text(
-                        'No posts yet!',
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                    )
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: myPosts.length,
-                      itemBuilder: (context, index) {
-                        return PostCard(post: myPosts[index]);
-                      },
+              child: const Text('Edit Profile', style: TextStyle(color: Colors.white)),
+            ),
+            const SizedBox(height: 24),
+            const Divider(color: Colors.grey),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text('My Posts', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            ),
+            const SizedBox(height: 10),
+            myPosts.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 48.0),
+                    child: Text(
+                      'No posts yet!',
+                      style: TextStyle(color: Colors.grey[600]),
                     ),
-            ],
-          ),
+                  )
+                : ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: myPosts.length,
+                    itemBuilder: (context, index) {
+                      return PostCard(post: myPosts[index]);
+                    },
+                  ),
+          ],
         ),
       ),
     );
