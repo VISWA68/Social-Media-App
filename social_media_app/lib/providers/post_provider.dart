@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media_app/models/comment_model.dart';
-import 'package:uuid/uuid.dart';
 import '../models/post_model.dart';
 import '../service/auth_service.dart';
 
@@ -21,6 +20,14 @@ class PostProvider with ChangeNotifier {
   final List<PostModel> _likedPosts = [];
   List<PostModel> get likedPosts => _likedPosts;
 
+  bool _hasInitialized = false;
+
+  void init() {
+    if (_hasInitialized) return;
+    _hasInitialized = true;
+    listenToPosts();
+  }
+
   void listenToPosts() {
     _firestore
         .collection('posts')
@@ -30,12 +37,14 @@ class PostProvider with ChangeNotifier {
       final allPosts =
           snapshot.docs.map((doc) => PostModel.fromMap(doc.data())).toList();
 
-      _posts.clear();
-      _posts.addAll(allPosts);
+      _posts
+        ..clear()
+        ..addAll(allPosts);
 
       final currentUserId = AuthService.getCurrentUserId();
-      _myPosts.clear();
-      _myPosts.addAll(allPosts.where((post) => post.userId == currentUserId));
+      _myPosts
+        ..clear()
+        ..addAll(allPosts.where((post) => post.userId == currentUserId));
 
       notifyListeners();
     });

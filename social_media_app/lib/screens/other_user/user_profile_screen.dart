@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:social_media_app/models/post_model.dart';
 import 'package:social_media_app/screens/other_user/user_model.dart';
 
 class UserProfileScreen extends StatefulWidget {
@@ -18,10 +19,38 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   void initState() {
     super.initState();
     _userFuture = _loadUserData();
+    _loadUserPosts();
+  }
+
+  List<PostModel> _userPosts = [];
+  bool _isLoadingPosts = true;
+
+  Future<void> _loadUserPosts() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('posts')
+          .where('userId', isEqualTo: widget.userId)
+          .orderBy('createdAt', descending: true)
+          .get();
+
+      setState(() {
+        _userPosts =
+            snapshot.docs.map((doc) => PostModel.fromMap(doc.data())).toList();
+        _isLoadingPosts = false;
+      });
+    } catch (e) {
+      print("Error loading user posts: $e");
+      setState(() {
+        _isLoadingPosts = false;
+      });
+    }
   }
 
   Future<UserModel> _loadUserData() async {
-    final doc = await FirebaseFirestore.instance.collection('users').doc(widget.userId).get();
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(widget.userId)
+        .get();
     if (!doc.exists) {
       throw Exception('User not found');
     }
@@ -44,11 +73,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         future: _userFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: Colors.blueAccent));
+            return const Center(
+                child: CircularProgressIndicator(color: Colors.blueAccent));
           }
           if (snapshot.hasError) {
             return Center(
-              child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.white70)),
+              child: Text('Error: ${snapshot.error}',
+                  style: const TextStyle(color: Colors.white70)),
             );
           }
 
@@ -70,7 +101,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(user.username,
-                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
+                    style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white)),
                 const SizedBox(height: 8),
                 Text(user.bio.isNotEmpty ? user.bio : "No bio yet",
                     style: TextStyle(color: Colors.grey[400])),
@@ -82,18 +116,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     _buildStat(context, 'Following', user.following.length),
                   ],
                 ),
-                const SizedBox(height: 24),
-                ElevatedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.grid_view_rounded, color: Colors.white),
-                  label: const Text('View Posts', style: TextStyle(color: Colors.white)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  ),
-                ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 30),
                 DefaultTabController(
                   length: 2,
                   child: Column(
@@ -130,7 +153,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget _buildStat(BuildContext context, String label, int count) {
     return Column(
       children: [
-        Text('$count', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+        Text('$count',
+            style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white)),
         const SizedBox(height: 4),
         Text(label, style: TextStyle(color: Colors.grey[400])),
       ],
@@ -143,21 +170,58 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Username: ${user.username}", style: const TextStyle(color: Colors.white)),
+          Text("Username: ${user.username}",
+              style: const TextStyle(color: Colors.white)),
           const SizedBox(height: 8),
-          Text("Bio: ${user.bio.isNotEmpty ? user.bio : 'No bio available.'}", style: TextStyle(color: Colors.grey[400])),
+          Text("Bio: ${user.bio.isNotEmpty ? user.bio : 'No bio available.'}",
+              style: TextStyle(color: Colors.grey[400])),
           const SizedBox(height: 8),
-          Text("Followers: ${user.followers.length}", style: const TextStyle(color: Colors.white)),
+          Text("Followers: ${user.followers.length}",
+              style: const TextStyle(color: Colors.white)),
           const SizedBox(height: 8),
-          Text("Following: ${user.following.length}", style: const TextStyle(color: Colors.white)),
+          Text("Following: ${user.following.length}",
+              style: const TextStyle(color: Colors.white)),
         ],
       ),
     );
   }
 
   Widget _buildPostsTab() {
-    return const Center(
-      child: Text("User's posts will appear here.", style: TextStyle(color: Colors.white70)),
+    if (_isLoadingPosts) {
+      return const Center(
+          child: CircularProgressIndicator(color: Colors.blueAccent));
+    }
+
+    if (_userPosts.isEmpty) {
+      return const Center(
+        child: Text("No posts yet", style: TextStyle(color: Colors.white70)),
+      );
+    }
+
+    return GridView.builder(
+      itemCount: _userPosts.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 4,
+        mainAxisSpacing: 4,
+      ),
+      itemBuilder: (context, index) {
+        final post = _userPosts[index];
+        return GestureDetector(
+          onTap: () {},
+          child: Image.network(
+            post.imageUrl,
+            fit: BoxFit.cover,
+            loadingBuilder: (context, child, progress) {
+              if (progress == null) return child;
+              return const Center(
+                  child: CircularProgressIndicator(color: Colors.grey));
+            },
+            errorBuilder: (context, error, stackTrace) =>
+                const Icon(Icons.broken_image, color: Colors.grey),
+          ),
+        );
+      },
     );
   }
 }

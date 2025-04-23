@@ -15,24 +15,34 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
   List<UserModel> _searchResults = [];
   bool _isLoading = false;
 
-  void _searchUsers(String query) async {
-    if (query.isEmpty) {
-      setState(() {
-        _searchResults = [];
-      });
-      return;
-    }
+  @override
+  void initState() {
+    _searchUsers("");
+    super.initState();
+  }
 
+  void _searchUsers(String query) async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .where('username', isGreaterThanOrEqualTo: query)
-          .where('username', isLessThanOrEqualTo: query + '\uf8ff')
-          .get();
+      QuerySnapshot snapshot;
+
+      if (query.isEmpty) {
+        // Fetch all users
+        snapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .orderBy('username')
+            .limit(50)
+            .get();
+      } else {
+        snapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .where('username', isGreaterThanOrEqualTo: query)
+            .where('username', isLessThanOrEqualTo: query + '\uf8ff')
+            .get();
+      }
 
       final results = snapshot.docs.map((doc) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
@@ -50,7 +60,7 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('Error searching users. Please try again.')),
+            content: Text('Error fetching users. Please try again.')),
       );
     }
   }
@@ -119,9 +129,6 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                               ),
                               title: Text(user.username,
                                   style: const TextStyle(color: Colors.white)),
-                              subtitle: Text(user.bio,
-                                  style:
-                                      const TextStyle(color: Colors.white70)),
                               onTap: () {
                                 if (user.id.isNotEmpty) {
                                   Navigator.push(

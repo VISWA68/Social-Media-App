@@ -45,31 +45,45 @@ class ProfileScreen extends StatelessWidget {
             CircleAvatar(
               radius: 55,
               backgroundColor: Colors.blueAccent,
-              backgroundImage: profileImageUrl != null && profileImageUrl.isNotEmpty
-                  ? NetworkImage(profileImageUrl)
-                  : const AssetImage('assets/default_avatar.png') as ImageProvider,
+              backgroundImage:
+                  profileImageUrl != null && profileImageUrl.isNotEmpty
+                      ? NetworkImage(profileImageUrl)
+                      : const AssetImage('assets/default_avatar.png')
+                          as ImageProvider,
             ),
             const SizedBox(height: 16),
             Text(username,
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
+                style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white)),
             const SizedBox(height: 4),
             Text(email, style: TextStyle(color: Colors.grey[400])),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const EditProfileScreen()));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blueAccent,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
               ),
-              child: const Text('Edit Profile', style: TextStyle(color: Colors.white)),
+              child: const Text('Edit Profile',
+                  style: TextStyle(color: Colors.white)),
             ),
             const SizedBox(height: 24),
             const Divider(color: Colors.grey),
             const Align(
-              alignment: Alignment.centerLeft,
-              child: Text('My Posts', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              alignment: Alignment.center,
+              child: Text('My Posts',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold)),
             ),
             const SizedBox(height: 10),
             myPosts.isEmpty

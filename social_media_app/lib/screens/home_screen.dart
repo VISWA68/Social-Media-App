@@ -34,6 +34,9 @@ class _HomeWrapperState extends State<HomeWrapper> {
   void initState() {
     super.initState();
     context.read<PostProvider>().listenToPosts();
+    Future.microtask(() {
+    Provider.of<PostProvider>(context, listen: false).init();
+  });
   }
 
   void _onProfileLongPress() {
