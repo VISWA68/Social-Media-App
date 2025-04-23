@@ -88,6 +88,16 @@ class PostProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> deletePost(String postId) async {
+    try {
+      await FirebaseFirestore.instance.collection('posts').doc(postId).delete();
+      myPosts.removeWhere((post) => post.id == postId);
+      notifyListeners();
+    } catch (e) {
+      print('Failed to delete post: $e');
+    }
+  }
+
   Future<void> createPost(File imageFile, String description) async {
     final post = await uploadPost(imageFile, description);
     _posts.insert(0, post);

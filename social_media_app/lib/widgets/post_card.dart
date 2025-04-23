@@ -3,17 +3,45 @@ import 'package:provider/provider.dart';
 import '../models/post_model.dart';
 import '../providers/post_provider.dart';
 import '../service/auth_service.dart';
-import 'comment_sheet.dart'; // Your previous comment sheet
+import 'comment_sheet.dart';
 
 class PostCard extends StatelessWidget {
   final PostModel post;
+  final bool isMyPost;
 
-  const PostCard({super.key, required this.post});
+  const PostCard({super.key, required this.post, this.isMyPost = false});
 
   @override
   Widget build(BuildContext context) {
     final currentUserId = AuthService.getCurrentUserId();
     final isLiked = post.likes.contains(currentUserId);
+
+    void _showDeleteConfirmation(BuildContext context, String postId) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Delete Post'),
+          content: const Text('Are you sure you want to delete this post?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              onPressed: () async {
+                await context.read<PostProvider>().deletePost(postId);
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Post deleted')),
+                );
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        ),
+      );
+    }
 
     return Card(
       color: Colors.grey[900],
@@ -40,10 +68,22 @@ class PostCard extends StatelessWidget {
               _formatDate(post.createdAt),
               style: TextStyle(color: Colors.grey[400], fontSize: 12),
             ),
-            trailing: IconButton(
-              icon: const Icon(Icons.more_vert, color: Colors.white),
-              onPressed: () {},
-            ),
+            trailing: isMyPost
+                ? PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert, color: Colors.white),
+                    onSelected: (value) {
+                      if (value == 'delete') {
+                        _showDeleteConfirmation(context, post.id);
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: 'delete',
+                        child: Text('Delete Post'),
+                      ),
+                    ],
+                  )
+                : null,
           ),
           ClipRRect(
             borderRadius: BorderRadius.circular(16),

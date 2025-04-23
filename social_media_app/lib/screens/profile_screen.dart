@@ -99,7 +99,10 @@ class ProfileScreen extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: myPosts.length,
                     itemBuilder: (context, index) {
-                      return PostCard(post: myPosts[index]);
+                      return PostCard(
+                        post: myPosts[index],
+                        isMyPost: true,
+                      );
                     },
                   ),
           ],
