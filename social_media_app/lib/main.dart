@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'package:social_media_app/screens/login_screen.dart';
 import 'providers/auth_provider.dart';
 import 'providers/post_provider.dart';
-import 'screens/login_screen.dart';
-import 'screens/feed_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,13 +24,14 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Velozity App',
+        title: 'Social Media App',
         theme: ThemeData(
-          useMaterial3: true,
+          scaffoldBackgroundColor: Colors.black,
+          colorScheme: ColorScheme.dark(),
+          textTheme: GoogleFonts.robotoTextTheme(ThemeData.dark().textTheme),
         ),
-        home: const LoginScreen(),
+        home: LoginScreen(),
       ),
     );
   }
 }
-

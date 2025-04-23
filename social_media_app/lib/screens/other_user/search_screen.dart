@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:social_media_app/screens/other_user/user_model.dart';
@@ -30,7 +31,6 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
       QuerySnapshot snapshot;
 
       if (query.isEmpty) {
-        // Fetch all users
         snapshot = await FirebaseFirestore.instance
             .collection('users')
             .orderBy('username')
@@ -120,7 +120,8 @@ class _UserSearchScreenState extends State<UserSearchScreen> {
                             margin: const EdgeInsets.symmetric(vertical: 6),
                             child: ListTile(
                               leading: CircleAvatar(
-                                backgroundImage: NetworkImage(user.profileUrl),
+                                backgroundImage:
+                                    CachedNetworkImageProvider(user.profileUrl),
                                 backgroundColor: Colors.grey[700],
                                 child: user.profileUrl.isEmpty
                                     ? const Icon(Icons.person,

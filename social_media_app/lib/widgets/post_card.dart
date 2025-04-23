@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/post_model.dart';
@@ -19,24 +20,48 @@ class PostCard extends StatelessWidget {
     void _showDeleteConfirmation(BuildContext context, String postId) {
       showDialog(
         context: context,
+        barrierDismissible: false,
         builder: (context) => AlertDialog(
-          title: const Text('Delete Post'),
-          content: const Text('Are you sure you want to delete this post?'),
+          backgroundColor: Colors.grey[900],
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Row(
+            children: const [
+              Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
+              SizedBox(width: 8),
+              Text('Delete Post', style: TextStyle(color: Colors.white)),
+            ],
+          ),
+          content: const Text(
+            'Are you sure you want to delete this post? This action cannot be undone.',
+            style: TextStyle(color: Colors.white70),
+          ),
+          actionsPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child:
+                  const Text('Cancel', style: TextStyle(color: Colors.white70)),
             ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
               onPressed: () async {
                 await context.read<PostProvider>().deletePost(postId);
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Post deleted')),
-                );
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Post deleted')),
+                  );
+                }
               },
-              child: const Text('Delete'),
+              icon: const Icon(Icons.delete_forever, size: 20),
+              label: const Text('Delete'),
             ),
           ],
         ),
@@ -53,11 +78,20 @@ class PostCard extends StatelessWidget {
         children: [
           ListTile(
             leading: CircleAvatar(
-              backgroundImage: post.profileUrl != null
-                  ? NetworkImage(post.profileUrl!)
-                  : const AssetImage('assets/default_avatar.png')
-                      as ImageProvider,
               radius: 22,
+              backgroundColor: Colors.grey[800],
+              child: ClipOval(
+                child: CachedNetworkImage(
+                  imageUrl: post.profileUrl ?? '',
+                  width: 44,
+                  height: 44,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) =>
+                      const CircularProgressIndicator(strokeWidth: 2),
+                  errorWidget: (context, url, error) =>
+                      const Icon(Icons.person, color: Colors.white),
+                ),
+              ),
             ),
             title: Text(
               post.username,
@@ -71,15 +105,25 @@ class PostCard extends StatelessWidget {
             trailing: isMyPost
                 ? PopupMenuButton<String>(
                     icon: const Icon(Icons.more_vert, color: Colors.white),
+                    color: Colors.grey[900],
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                     onSelected: (value) {
                       if (value == 'delete') {
                         _showDeleteConfirmation(context, post.id);
                       }
                     },
                     itemBuilder: (context) => [
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'delete',
-                        child: Text('Delete Post'),
+                        child: Row(
+                          children: const [
+                            Icon(Icons.delete_outline, color: Colors.redAccent),
+                            SizedBox(width: 8),
+                            Text('Delete Post',
+                                style: TextStyle(color: Colors.white)),
+                          ],
+                        ),
                       ),
                     ],
                   )
@@ -87,17 +131,17 @@ class PostCard extends StatelessWidget {
           ),
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            child: Image.network(
-              post.imageUrl,
+            child: CachedNetworkImage(
+              imageUrl: post.imageUrl,
               width: double.infinity,
               height: 300,
               fit: BoxFit.cover,
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) return child;
-                return const Center(
-                  child: CircularProgressIndicator(color: Colors.blueAccent),
-                );
-              },
+              placeholder: (context, url) => const Center(
+                child: CircularProgressIndicator(color: Colors.blueAccent),
+              ),
+              errorWidget: (context, url, error) => const Center(
+                child: Icon(Icons.error, color: Colors.red),
+              ),
             ),
           ),
           Padding(

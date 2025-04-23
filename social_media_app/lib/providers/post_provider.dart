@@ -99,10 +99,7 @@ class PostProvider with ChangeNotifier {
   }
 
   Future<void> createPost(File imageFile, String description) async {
-    final post = await uploadPost(imageFile, description);
-    _posts.insert(0, post);
-    _myPosts.insert(0, post);
-    notifyListeners();
+    await uploadPost(imageFile, description);
   }
 
   Future<String> _uploadImage(File imageFile, String postId) async {

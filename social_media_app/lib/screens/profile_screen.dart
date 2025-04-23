@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
@@ -18,6 +19,25 @@ class ProfileScreen extends StatelessWidget {
     final username = user?.username ?? 'No username';
     final email = user?.email ?? 'Anonymous';
 
+    void _onLogOut() {
+      showModalBottomSheet(
+        backgroundColor: Colors.grey[900],
+        context: context,
+        builder: (_) => ListTile(
+          leading: const Icon(Icons.logout, color: Colors.white),
+          title: const Text("Logout", style: TextStyle(color: Colors.white)),
+          onTap: () {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LoginScreen(),
+                ));
+            context.read<AuthProvider>().logout();
+          },
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -26,16 +46,7 @@ class ProfileScreen extends StatelessWidget {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              context.read<AuthProvider>().logout();
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginScreen()),
-              );
-            },
-          ),
+          IconButton(icon: const Icon(Icons.logout), onPressed: _onLogOut),
         ],
       ),
       body: SingleChildScrollView(
@@ -47,7 +58,7 @@ class ProfileScreen extends StatelessWidget {
               backgroundColor: Colors.blueAccent,
               backgroundImage:
                   profileImageUrl != null && profileImageUrl.isNotEmpty
-                      ? NetworkImage(profileImageUrl)
+                      ? CachedNetworkImageProvider(profileImageUrl)
                       : const AssetImage('assets/default_avatar.png')
                           as ImageProvider,
             ),

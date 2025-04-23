@@ -17,12 +17,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final TextEditingController _usernameController = TextEditingController();
   File? _newProfilePic;
   String? currentProfileUrl;
+  bool _isSaving = false;
 
   @override
   void initState() {
     super.initState();
     final user = FirebaseAuth.instance.currentUser!;
-    FirebaseFirestore.instance.collection('users').doc(user.uid).get().then((doc) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get()
+        .then((doc) {
       _usernameController.text = doc['username'];
       currentProfileUrl = doc['profileUrl'];
       setState(() {});
@@ -32,62 +37,112 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Edit Profile")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title:
+            const Text("Edit Profile", style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             GestureDetector(
-              onTap: () async {
-                final picker = ImagePicker();
-                final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-                if (pickedFile != null) {
-                  setState(() => _newProfilePic = File(pickedFile.path));
-                }
-              },
-              child: CircleAvatar(
-                radius: 50,
-                backgroundImage: _newProfilePic != null
-                    ? FileImage(_newProfilePic!)
-                    : currentProfileUrl != null
-                        ? NetworkImage(currentProfileUrl!) as ImageProvider
+              onTap: _pickProfileImage,
+              child: Stack(
+                alignment: Alignment.bottomRight,
+                children: [
+                  CircleAvatar(
+                    radius: 60,
+                    backgroundColor: Colors.blueAccent,
+                    backgroundImage: _newProfilePic != null
+                        ? FileImage(_newProfilePic!)
+                        : currentProfileUrl != null
+                            ? NetworkImage(currentProfileUrl!) as ImageProvider
+                            : null,
+                    child: (_newProfilePic == null && currentProfileUrl == null)
+                        ? const Icon(Icons.person,
+                            size: 60, color: Colors.white)
                         : null,
-                child: _newProfilePic == null && currentProfileUrl == null
-                    ? const Icon(Icons.person)
-                    : null,
+                  ),
+                  const CircleAvatar(
+                    radius: 18,
+                    backgroundColor: Colors.blueAccent,
+                    child: Icon(Icons.edit, color: Colors.white, size: 20),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             TextField(
               controller: _usernameController,
-              decoration: const InputDecoration(labelText: 'Username'),
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                labelText: 'Username',
+                labelStyle: const TextStyle(color: Colors.white70),
+                filled: true,
+                fillColor: Colors.grey[850],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
             ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () async {
-                final user = FirebaseAuth.instance.currentUser!;
-                String? updatedUrl = currentProfileUrl;
-
-                if (_newProfilePic != null) {
-                  final ref = FirebaseStorage.instance.ref().child('profile_pics/${user.uid}.jpg');
-                  await ref.putFile(_newProfilePic!);
-                  updatedUrl = await ref.getDownloadURL();
-                }
-
-                await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
-                  'username': _usernameController.text,
-                  'profileUrl': updatedUrl,
-                });
-
-                if (context.mounted) {
-                  Navigator.pop(context);
-                }
-              },
-              child: const Text("Save"),
+            const SizedBox(height: 32),
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton(
+                onPressed: _isSaving ? null : _saveProfile,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
+                ),
+                child: _isSaving
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text("Save",
+                        style: TextStyle(fontSize: 18, color: Colors.white)),
+              ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _pickProfileImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() => _newProfilePic = File(pickedFile.path));
+    }
+  }
+
+  Future<void> _saveProfile() async {
+    setState(() => _isSaving = true);
+
+    final user = FirebaseAuth.instance.currentUser!;
+    String? updatedUrl = currentProfileUrl;
+
+    if (_newProfilePic != null) {
+      final ref =
+          FirebaseStorage.instance.ref().child('profile_pics/${user.uid}.jpg');
+      await ref.putFile(_newProfilePic!);
+      updatedUrl = await ref.getDownloadURL();
+    }
+
+    await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
+      'username': _usernameController.text.trim(),
+      'profileUrl': updatedUrl,
+    });
+
+    if (context.mounted) {
+      Navigator.pop(context);
+    }
+
+    setState(() => _isSaving = false);
   }
 }

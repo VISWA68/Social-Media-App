@@ -35,27 +35,8 @@ class _HomeWrapperState extends State<HomeWrapper> {
     super.initState();
     context.read<PostProvider>().listenToPosts();
     Future.microtask(() {
-    Provider.of<PostProvider>(context, listen: false).init();
-  });
-  }
-
-  void _onProfileLongPress() {
-    showModalBottomSheet(
-      backgroundColor: Colors.grey[900],
-      context: context,
-      builder: (_) => ListTile(
-        leading: const Icon(Icons.logout, color: Colors.white),
-        title: const Text("Logout", style: TextStyle(color: Colors.white)),
-        onTap: () {
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const LoginScreen(),
-              ));
-          context.read<AuthProvider>().logout();
-        },
-      ),
-    );
+      Provider.of<PostProvider>(context, listen: false).init();
+    });
   }
 
   DateTime? _lastBackPressed;
@@ -137,9 +118,6 @@ class _HomeWrapperState extends State<HomeWrapper> {
               );
               return;
             }
-            if (index == 4) {
-              _onProfileLongPress();
-            }
             setState(() {
               _currentIndex = index;
             });
@@ -154,10 +132,7 @@ class _HomeWrapperState extends State<HomeWrapper> {
             const BottomNavigationBarItem(
                 icon: Icon(Icons.favorite_border), label: 'Likes'),
             BottomNavigationBarItem(
-              icon: GestureDetector(
-                onLongPress: _onProfileLongPress,
-                child: const Icon(Icons.person_outline),
-              ),
+              icon: Icon(Icons.person_outline),
               label: 'Profile',
             ),
           ],
