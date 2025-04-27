@@ -35,4 +35,3 @@ flutter run
 
 ---
 
-Developed for evaluation of the Velozity Global Solutions project task.
